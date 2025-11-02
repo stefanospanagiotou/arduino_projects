@@ -1,4 +1,21 @@
-Το πρόγραμμα ανάβει τη λυχνία LED όταν το περιβάλλον είναι σκοτεινό
-και τη σβήνει όταν υπάρχει αρκετό φως.
-Ουσιαστικά λειτουργεί σαν αυτόματος ανιχνευτής φωτός —
-το LED ενεργοποιείται μόνο όταν χρειάζεται φωτισμός.
+
+const int ledPin = 13;   
+const int ldrPin = A0;   
+int lightLevel;         
+
+void setup() {
+  pinMode(ledPin, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  lightLevel = analogRead(ldrPin); 
+
+  if (lightLevel < 400) {          
+    digitalWrite(ledPin, HIGH);    
+  } else {
+    digitalWrite(ledPin, LOW);      
+  }
+
+  delay(500);                      
+}
