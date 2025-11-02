@@ -1,0 +1,65 @@
+
+int led1 = 12;
+int led2 = 11;
+int buzzerPin = 10;
+int buttonPin = 2;
+
+bool sirenOn = false;
+bool lastButtonState = HIGH;
+
+void setup() {
+  pinMode(led1, OUTPUT);
+  pinMode(led2, OUTPUT);
+  pinMode(buzzerPin, OUTPUT);
+  pinMode(buttonPin, INPUT_PULLUP); 
+
+
+  digitalWrite(led1, HIGH);
+  digitalWrite(led2, HIGH);
+  noTone(buzzerPin);
+}
+
+void sweepSiren(int startFreq, int endFreq, int step, int delayMs, bool led1On) {
+  if (startFreq < endFreq) {
+    for (int f = startFreq; f <= endFreq; f += step) {
+      if (!sirenOn) return;
+      tone(buzzerPin, f);
+      digitalWrite(led1, led1On ? HIGH : LOW);
+      digitalWrite(led2, led1On ? LOW : HIGH);
+      delay(delayMs);
+    }
+  } else {
+    for (int f = startFreq; f >= endFreq; f -= step) {
+      if (!sirenOn) return;
+      tone(buzzerPin, f);
+      digitalWrite(led1, led1On ? HIGH : LOW);
+      digitalWrite(led2, led1On ? LOW : HIGH);
+      delay(delayMs);
+    }
+  }
+}
+
+void loop() {
+  bool buttonState = digitalRead(buttonPin);
+
+  // Toggle on button press
+  if (buttonState == LOW && lastButtonState == HIGH) {
+    delay(50); // debounce
+    if (digitalRead(buttonPin) == LOW) {
+      sirenOn = !sirenOn;
+      if (!sirenOn) {
+        noTone(buzzerPin);
+        digitalWrite(led1, HIGH);
+        digitalWrite(led2, HIGH);
+      }
+    }
+  }
+  lastButtonState = buttonState;
+
+  if (sirenOn) {
+    sweepSiren(600, 1300, 15, 2, true);
+    delay(50);
+    sweepSiren(1300, 600, 15, 2, false);
+    delay(80);
+  }
+}
